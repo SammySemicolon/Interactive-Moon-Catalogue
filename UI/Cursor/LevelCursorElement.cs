@@ -4,7 +4,7 @@ using InteractiveTerminalAPI.UI.Cursor;
 using System.Text;
 using UnityEngine;
 
-namespace InteractiveMoonCatalogue.Misc.UI.Cursor
+namespace InteractiveMoonCatalogue.UI.Cursor
 {
     internal class LevelCursorElement : CursorElement
     {
@@ -22,20 +22,25 @@ namespace InteractiveMoonCatalogue.Misc.UI.Cursor
             }
             else
             {
-                name = $"{Level.PlanetName.Substring(Level.PlanetName.IndexOf(' ')+1)}";
+                name = $"{Level.PlanetName.Substring(Level.PlanetName.IndexOf(' ') + 1)}";
                 isCompany = name.Contains("Gordion");
                 if (isCompany) name += " / The Company";
             }
             Terminal terminal = Tools.GetTerminal();
             int groupCredits = terminal.groupCredits;
 
-            if(!Active(this))
+            if (!Active(this))
             {
                 if (Level == StartOfRound.Instance.currentLevel)
                     sb.Append("<color=#026440>");
                 else sb.Append("<color=#66666666>");
             }
             sb.Append(name);
+            if (LethalLevelLoaderCompat.Enabled && LethalLevelLoaderCompat.IsLocked(Level))
+            {
+                sb.Append("</color>");
+                return sb.ToString();
+            }
             sb.Append(new string(' ', Mathf.Max(0, 14 - name.Length)));
             string risk = "";
             if (!string.IsNullOrEmpty(Level.riskLevel) && !Level.riskLevel.Contains("Safe"))
@@ -81,7 +86,7 @@ namespace InteractiveMoonCatalogue.Misc.UI.Cursor
 
         void AppendWeatherText(ref StringBuilder sb, ref string previousText)
         {
-            LevelWeatherType weather = Level.currentWeather;
+            LevelWeatherType weather = Level.overrideWeather ? Level.overrideWeatherType : Level.currentWeather;
             if (weather != LevelWeatherType.None)
             {
                 sb.Append(new string(' ', Mathf.Max(0, 9 - previousText.Length)));

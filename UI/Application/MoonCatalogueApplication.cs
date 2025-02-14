@@ -1,5 +1,5 @@
 ﻿using InteractiveMoonCatalogue.Compat;
-using InteractiveMoonCatalogue.Misc.UI.Cursor;
+using InteractiveMoonCatalogue.UI.Cursor;
 using InteractiveTerminalAPI.UI;
 using InteractiveTerminalAPI.UI.Application;
 using InteractiveTerminalAPI.UI.Cursor;
@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.InputSystem;
 
-namespace InteractiveMoonCatalogue.Misc.UI.Application
+namespace InteractiveMoonCatalogue.UI.Application
 {
     internal class MoonCatalogueApplication : PageApplication
     {
@@ -23,6 +23,7 @@ namespace InteractiveMoonCatalogue.Misc.UI.Application
             List<SelectableLevel> levelsIndex = StartOfRound.Instance.levels.ToList(); //disgusting
             SelectableLevel[] levels = StartOfRound.Instance.levels;
             levels = levels.Where(x => !x.PlanetName.Contains("Liquidation")).ToArray();
+            if (LethalLevelLoaderCompat.Enabled) LethalLevelLoaderCompat.GrabAllAvailableLevels(ref levels);
             (SelectableLevel[][], CursorMenu[], IScreen[]) entries = GetPageEntries(levels);
 
             SelectableLevel[][] pagesLevels = entries.Item1;
@@ -88,7 +89,7 @@ namespace InteractiveMoonCatalogue.Misc.UI.Application
             if (cursor2 == null) return -1;
             LevelCursorElement element = cursor1 as LevelCursorElement;
             LevelCursorElement element2 = cursor2 as LevelCursorElement;
-            string name1 = element.Level.PlanetName.Substring(element.Level.PlanetName.IndexOf(' ')+1);
+            string name1 = element.Level.PlanetName.Substring(element.Level.PlanetName.IndexOf(' ') + 1);
             string name2 = element2.Level.PlanetName.Substring(element2.Level.PlanetName.IndexOf(' ') + 1);
             return name1.CompareTo(name2);
         }
@@ -148,8 +149,8 @@ namespace InteractiveMoonCatalogue.Misc.UI.Application
             if (cursor2 == null) return -1;
             LevelCursorElement element = cursor1 as LevelCursorElement;
             LevelCursorElement element2 = cursor2 as LevelCursorElement;
-            LevelWeatherType weather1 = element.Level.currentWeather;
-            LevelWeatherType weather2 = element2.Level.currentWeather;
+            LevelWeatherType weather1 = element.Level.overrideWeather ? element.Level.overrideWeatherType : element.Level.currentWeather;
+            LevelWeatherType weather2 = element2.Level.overrideWeather ? element2.Level.overrideWeatherType : element2.Level.currentWeather;
             return weather1.CompareTo(weather2);
         }
         int CompareAscendingWeather(CursorElement cursor1, CursorElement cursor2)
@@ -158,8 +159,8 @@ namespace InteractiveMoonCatalogue.Misc.UI.Application
             if (cursor2 == null) return -1;
             LevelCursorElement element = cursor1 as LevelCursorElement;
             LevelCursorElement element2 = cursor2 as LevelCursorElement;
-            LevelWeatherType weather1 = element.Level.currentWeather;
-            LevelWeatherType weather2 = element2.Level.currentWeather;
+            LevelWeatherType weather1 = element.Level.overrideWeather ? element.Level.overrideWeatherType : element.Level.currentWeather;
+            LevelWeatherType weather2 = element2.Level.overrideWeather ? element2.Level.overrideWeatherType : element2.Level.currentWeather;
             return weather2.CompareTo(weather1);
         }
 
@@ -168,14 +169,14 @@ namespace InteractiveMoonCatalogue.Misc.UI.Application
             int currentSort = currentCursorMenu.sortingIndex;
             return currentSort switch
             {
-                0 => $"Sorted by: Alphabetical [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                1 => $"Sorted by: Price (Descending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                2 => $"Sorted by: Price (Ascending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                3 => $"Sorted by: Difficulty (Descending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                4 => $"Sorted by: Difficulty (Ascending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                5 => $"Sorted by: Weather (Descending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                6 => $"Sorted by: Weather (Ascending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                _ => $"Sorted by: None [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
+                0 => $"Sort: Alphabetical [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
+                1 => $"Sort: Price (Descending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
+                2 => $"Sort: Price (Ascending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
+                3 => $"Sort: Difficulty (Descending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
+                4 => $"Sort: Difficulty (Ascending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
+                5 => $"Sort: Weather (Descending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
+                6 => $"Sort: Weather (Ascending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
+                _ => $"Sort: None [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
             };
         }
         TerminalNode GetRouteNode(int levelIndex)

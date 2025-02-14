@@ -1,4 +1,5 @@
 ﻿using LethalLevelLoader;
+using System.Linq;
 
 namespace InteractiveMoonCatalogue.Compat
 {
@@ -7,6 +8,10 @@ namespace InteractiveMoonCatalogue.Compat
         public static bool Enabled =>
             BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(LethalLevelLoader.Plugin.ModGUID);
 
+        internal static void GrabAllAvailableLevels(ref SelectableLevel[] levels)
+        {
+            levels = levels.Where(x => PatchedContent.TryGetExtendedContent(x, out ExtendedLevel extendedLevel) && !extendedLevel.IsRouteHidden).ToArray();
+        }
         internal static int CompareAscendingDifficulty(SelectableLevel level1, SelectableLevel level2)
         {
             PatchedContent.TryGetExtendedContent(level1, out ExtendedLevel extendedLevel1);
@@ -25,8 +30,7 @@ namespace InteractiveMoonCatalogue.Compat
         {
             ExtendedLevel extendedLevel;
             PatchedContent.TryGetExtendedContent(level, out extendedLevel);
-            if (extendedLevel == null || extendedLevel.IsRouteLocked) return true;
-            return false;
+            return extendedLevel == null || extendedLevel.IsRouteLocked;
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using InteractiveMoonCatalogue.Misc.UI.Application;
+using InteractiveMoonCatalogue.UI.Application;
 using InteractiveTerminalAPI.UI;
 using WeatherProbe.Misc;
 namespace InteractiveMoonCatalogue
@@ -15,7 +15,7 @@ namespace InteractiveMoonCatalogue
 
         void Awake()
         {
-            InteractiveTerminalManager.RegisterApplication<MoonCatalogueApplication>("moons", caseSensitive: false);
+            InteractiveTerminalManager.RegisterApplication<MoonCatalogueApplication>("imoons", caseSensitive: false);
             mls = Logger;
             mls.LogInfo($"{Metadata.NAME} {Metadata.VERSION} has been loaded successfully.");
         }
