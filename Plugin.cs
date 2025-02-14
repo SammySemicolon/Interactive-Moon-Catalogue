@@ -7,17 +7,16 @@ using WeatherProbe.Misc;
 namespace InteractiveMoonCatalogue
 {
     [BepInPlugin(Metadata.GUID,Metadata.NAME,Metadata.VERSION)]
-    [BepInDependency("com.sigurd.csync")]
     [BepInDependency("WhiteSpike.InteractiveTerminalAPI")]
     public class Plugin : BaseUnityPlugin
     {
         internal static readonly Harmony harmony = new(Metadata.GUID);
-        internal static readonly ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource(Metadata.NAME);
+        internal static ManualLogSource mls;
 
         void Awake()
         {
             InteractiveTerminalManager.RegisterApplication<MoonCatalogueApplication>("moons", caseSensitive: false);
-
+            mls = Logger;
             mls.LogInfo($"{Metadata.NAME} {Metadata.VERSION} has been loaded successfully.");
         }
     }   
