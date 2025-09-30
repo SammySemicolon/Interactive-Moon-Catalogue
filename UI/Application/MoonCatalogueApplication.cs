@@ -37,13 +37,13 @@ namespace InteractiveMoonCatalogue.UI.Application
                 cursorMenus[i] = CursorMenu.Create(startingCursorIndex: 0, elements: elements,
                     sorting:
                     [
-                        CompareName,
-                        CompareDescendingPrice,
-                        CompareAscendingPrice,
-                        CompareDescendingDifficulty,
                         CompareAscendingDifficulty,
+                        CompareDescendingDifficulty,
+                        CompareAscendingPrice,
+                        CompareDescendingPrice,
+                        CompareAscendingWeather,
                         CompareDescendingWeather,
-                        CompareAscendingWeather
+                        CompareName
                     ]);
                 cursorMenus[i].sortingIndex = -1;
                 CursorMenu cursorMenu = cursorMenus[i];
@@ -169,14 +169,14 @@ namespace InteractiveMoonCatalogue.UI.Application
             int currentSort = currentCursorMenu.sortingIndex;
             return currentSort switch
             {
-                0 => $"Sort: Alphabetical [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                1 => $"Sort: Price (Descending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
+                0 => $"Sort: Difficulty (Ascending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
+                1 => $"Sort: Difficulty (Descending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
                 2 => $"Sort: Price (Ascending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                3 => $"Sort: Difficulty (Descending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                4 => $"Sort: Difficulty (Ascending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
+                3 => $"Sort: Price (Descending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
+                4 => $"Sort: Weather (Ascending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
                 5 => $"Sort: Weather (Descending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                6 => $"Sort: Weather (Ascending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                _ => $"Sort: None [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
+                6 => $"Sort: Alphabetical [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
+                _ => $"Sort: None [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]"
             };
         }
         TerminalNode GetRouteNode(int levelIndex)
