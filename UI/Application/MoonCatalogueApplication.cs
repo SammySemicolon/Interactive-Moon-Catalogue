@@ -34,18 +34,7 @@ namespace InteractiveMoonCatalogue.UI.Application
             {
                 SelectableLevel[] levelList = pagesLevels[i];
                 CursorElement[] elements = new CursorElement[levelList.Length];
-                cursorMenus[i] = CursorMenu.Create(startingCursorIndex: 0, elements: elements,
-                    sorting:
-                    [
-                        CompareAscendingDifficulty,
-                        CompareDescendingDifficulty,
-                        CompareAscendingPrice,
-                        CompareDescendingPrice,
-                        CompareAscendingWeather,
-                        CompareDescendingWeather,
-                        CompareName
-                    ]);
-                cursorMenus[i].sortingIndex = -1;
+                cursorMenus[i] = CursorMenu.Create(startingCursorIndex: 0, elements: elements, sorting: [CompareElements]);
                 CursorMenu cursorMenu = cursorMenus[i];
                 ITextElement[] textElements =
                     [
@@ -53,12 +42,10 @@ namespace InteractiveMoonCatalogue.UI.Application
                         TextElement.Create(text: " "),
                         cursorMenu
                     ];
-                screens[i] = new BoxedOutputScreen<string, string>()
+                screens[i] = new BoxedScreen()
                 {
                     Title = "Moon Catalogue",
                     elements = textElements,
-                    Input = GetCurrentSort,
-                    Output = (x) => x,
                 };
 
                 for (int j = 0; j < levelList.Length; j++)
@@ -82,18 +69,10 @@ namespace InteractiveMoonCatalogue.UI.Application
             currentPage = initialPage;
             currentCursorMenu = initialPage.GetCurrentCursorMenu();
             currentScreen = initialPage.GetCurrentScreen();
+            ChangeSorting();
         }
-        int CompareName(CursorElement cursor1, CursorElement cursor2)
-        {
-            if (cursor1 == null) return 1;
-            if (cursor2 == null) return -1;
-            LevelCursorElement element = cursor1 as LevelCursorElement;
-            LevelCursorElement element2 = cursor2 as LevelCursorElement;
-            string name1 = element.Level.PlanetName.Substring(element.Level.PlanetName.IndexOf(' ') + 1);
-            string name2 = element2.Level.PlanetName.Substring(element2.Level.PlanetName.IndexOf(' ') + 1);
-            return name1.CompareTo(name2);
-        }
-        int CompareDescendingPrice(CursorElement cursor1, CursorElement cursor2)
+        //Price first, risk second, name as last resort
+        int CompareElements(CursorElement cursor1, CursorElement cursor2)
         {
             if (cursor1 == null) return 1;
             if (cursor2 == null) return -1;
@@ -101,84 +80,40 @@ namespace InteractiveMoonCatalogue.UI.Application
             LevelCursorElement element2 = cursor2 as LevelCursorElement;
             int price1 = element.RouteNode.itemCost;
             int price2 = element2.RouteNode.itemCost;
-            return price1.CompareTo(price2);
-        }
-        int CompareAscendingPrice(CursorElement cursor1, CursorElement cursor2)
-        {
-            if (cursor1 == null) return 1;
-            if (cursor2 == null) return -1;
-            LevelCursorElement element = cursor1 as LevelCursorElement;
-            LevelCursorElement element2 = cursor2 as LevelCursorElement;
-            int price1 = element.RouteNode.itemCost;
-            int price2 = element2.RouteNode.itemCost;
+            if (price1 == price2)
+            {
+                int risk1 = EvaluateRiskLevel(element);
+                int risk2 = EvaluateRiskLevel(element2);
+                if (risk1 == risk2)
+                {
+                    string name1 = element.Level.PlanetName.Substring(element.Level.PlanetName.IndexOf(' ') + 1);
+                    string name2 = element2.Level.PlanetName.Substring(element2.Level.PlanetName.IndexOf(' ') + 1);
+                    return name1.CompareTo(name2);
+                }
+                return risk2.CompareTo(risk1);
+            }
             return price2.CompareTo(price1);
         }
-        int CompareDescendingDifficulty(CursorElement cursor1, CursorElement cursor2)
-        {
-            if (cursor1 == null) return 1;
-            if (cursor2 == null) return -1;
-            LevelCursorElement element = cursor1 as LevelCursorElement;
-            LevelCursorElement element2 = cursor2 as LevelCursorElement;
-            if (LethalLevelLoaderCompat.Enabled)
-            {
-                return LethalLevelLoaderCompat.CompareDescendingDifficulty(element.Level, element2.Level);
-            }
 
-            string riskLevel1 = element.Level.riskLevel;
-            string riskLevel2 = element2.Level.riskLevel;
-            return riskLevel2.CompareTo(riskLevel1);
-
-        }
-        int CompareAscendingDifficulty(CursorElement cursor1, CursorElement cursor2)
+        int EvaluateRiskLevel(LevelCursorElement element)
         {
-            if (cursor1 == null) return 1;
-            if (cursor2 == null) return -1;
-            LevelCursorElement element = cursor1 as LevelCursorElement;
-            LevelCursorElement element2 = cursor2 as LevelCursorElement;
-            if (LethalLevelLoaderCompat.Enabled)
+            string risk = element.Level.riskLevel;
+            int plusses = risk.Count(c => c == '+');
+            int minusses = risk.Count(c => c == '-');
+            risk.Replace("+", "");
+            risk.Replace("-", "");
+            risk.Replace(" ", "");
+            return risk switch
             {
-                return LethalLevelLoaderCompat.CompareAscendingDifficulty(element.Level, element2.Level);
-            }
-            string riskLevel1 = element.Level.riskLevel;
-            string riskLevel2 = element2.Level.riskLevel;
-            return riskLevel1.CompareTo(riskLevel2);
-        }
-        int CompareDescendingWeather(CursorElement cursor1, CursorElement cursor2)
-        {
-            if (cursor1 == null) return 1;
-            if (cursor2 == null) return -1;
-            LevelCursorElement element = cursor1 as LevelCursorElement;
-            LevelCursorElement element2 = cursor2 as LevelCursorElement;
-            LevelWeatherType weather1 = element.Level.overrideWeather ? element.Level.overrideWeatherType : element.Level.currentWeather;
-            LevelWeatherType weather2 = element2.Level.overrideWeather ? element2.Level.overrideWeatherType : element2.Level.currentWeather;
-            return weather1.CompareTo(weather2);
-        }
-        int CompareAscendingWeather(CursorElement cursor1, CursorElement cursor2)
-        {
-            if (cursor1 == null) return 1;
-            if (cursor2 == null) return -1;
-            LevelCursorElement element = cursor1 as LevelCursorElement;
-            LevelCursorElement element2 = cursor2 as LevelCursorElement;
-            LevelWeatherType weather1 = element.Level.overrideWeather ? element.Level.overrideWeatherType : element.Level.currentWeather;
-            LevelWeatherType weather2 = element2.Level.overrideWeather ? element2.Level.overrideWeatherType : element2.Level.currentWeather;
-            return weather2.CompareTo(weather1);
+                "D" => 100,
+                "C" => 200,
+                "B" => 300,
+                "A" => 400,
+                "S" => 500,
+                _ => 1000,// any moon that has a non standard risk value probably is special enough to be considered hard
+            } + plusses - minusses;
         }
 
-        string GetCurrentSort()
-        {
-            int currentSort = currentCursorMenu.sortingIndex;
-            return currentSort switch
-            {
-                0 => $"Sort: Difficulty (Ascending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                1 => $"Sort: Difficulty (Descending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                2 => $"Sort: Price (Ascending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                3 => $"Sort: Price (Descending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                4 => $"Sort: Weather (Ascending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                5 => $"Sort: Weather (Descending) [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                6 => $"Sort: Alphabetical [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]",
-                _ => $"Sort: None [{InteractiveTerminalAPI.Compat.InputUtils_Compat.ChangeApplicationSortingKey.GetBindingDisplayString()}]"
-            };
-        }
         TerminalNode GetRouteNode(int levelIndex)
         {
             if (routeKeyword == null) routeKeyword = terminal.terminalNodes.allKeywords.First(k => k.word == "route");

@@ -15,7 +15,7 @@ namespace InteractiveMoonCatalogue
 
         void Awake()
         {
-            InteractiveTerminalManager.RegisterApplication<MoonCatalogueApplication>("imoons", caseSensitive: false);
+            InteractiveTerminalManager.RegisterApplication<MoonCatalogueApplication>("moons", caseSensitive: false);
             mls = Logger;
             mls.LogInfo($"{Metadata.NAME} {Metadata.VERSION} has been loaded successfully.");
         }
