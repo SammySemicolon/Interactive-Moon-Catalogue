@@ -4,6 +4,6 @@
     {
         public const string GUID = "com.github.SammySemicolon.InteractiveMoonCatalogue";
         public const string NAME = "Interactive Moon Catalogue Forked";
-        public const string VERSION = "1.1.0";
+        public const string VERSION = "1.2.0";
     }
 }
