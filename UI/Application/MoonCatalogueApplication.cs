@@ -11,7 +11,7 @@ using UnityEngine.InputSystem;
 
 namespace InteractiveMoonCatalogue.UI.Application
 {
-    internal class MoonCatalogueApplication : PageApplication
+    internal class MoonCatalogueApplication : PageApplication<CursorElement>
     {
         TerminalKeyword routeKeyword;
         protected override int GetEntriesPerPage<T>(T[] entries)
@@ -24,18 +24,18 @@ namespace InteractiveMoonCatalogue.UI.Application
             SelectableLevel[] levels = StartOfRound.Instance.levels;
             levels = levels.Where(x => !x.PlanetName.Contains("Liquidation")).ToArray();
             if (LethalLevelLoaderCompat.Enabled) LethalLevelLoaderCompat.GrabAllAvailableLevels(ref levels);
-            (SelectableLevel[][], CursorMenu[], IScreen[]) entries = GetPageEntries(levels);
+            (SelectableLevel[][], BaseCursorMenu<CursorElement>[], IScreen[]) entries = GetPageEntries(levels);
 
             SelectableLevel[][] pagesLevels = entries.Item1;
-            CursorMenu[] cursorMenus = entries.Item2;
+            BaseCursorMenu<CursorElement>[] cursorMenus = entries.Item2;
             IScreen[] screens = entries.Item3;
 
             for (int i = 0; i < pagesLevels.Length; i++)
             {
                 SelectableLevel[] levelList = pagesLevels[i];
-                CursorElement[] elements = new CursorElement[levelList.Length];
-                cursorMenus[i] = CursorMenu.Create(startingCursorIndex: 0, elements: elements, sorting: [CompareElements]);
-                CursorMenu cursorMenu = cursorMenus[i];
+                LevelCursorElement[] elements = new LevelCursorElement[levelList.Length];
+                cursorMenus[i] = CursorMenu<CursorElement>.Create(startingCursorIndex: 0, elements: elements, sorting: [CompareElements]);
+                BaseCursorMenu<CursorElement> cursorMenu = cursorMenus[i];
                 ITextElement[] textElements =
                     [
                         TextElement.Create(text: "Select the moon you wish to route to:"),
@@ -69,7 +69,7 @@ namespace InteractiveMoonCatalogue.UI.Application
             currentPage = initialPage;
             currentCursorMenu = initialPage.GetCurrentCursorMenu();
             currentScreen = initialPage.GetCurrentScreen();
-            ChangeSorting();
+            currentPage.ChangeSorting();
         }
         //Price first, risk second, name as last resort
         int CompareElements(CursorElement cursor1, CursorElement cursor2)
